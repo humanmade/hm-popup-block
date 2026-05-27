@@ -1,6 +1,6 @@
 {
-	"name": "humanmade/popup",
-	"description": "An exit intent popup block that shows when someone may be about to leave the site",
+	"name": "humanmade/hm-popup-block",
+	"description": "An popup and tooltip dialog block utility, multiple trigger options, and supports anchor placements",
 	"type": "wordpress-plugin",
 	"license": "GPL-2.0-or-later",
 	"authors": [
@@ -11,6 +11,9 @@
 	],
 	"require": {
 		"composer/installers": "^1 || ^2"
+	},
+	"replace": {
+		"humanmade/popup": "*"
 	},
 	"config": {
 		"allow-plugins": {
