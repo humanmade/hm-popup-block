@@ -301,12 +301,21 @@ test.describe( 'Popup Block Options', () => {
 			editor,
 			page,
 		} ) => {
-			// Insert a link that targets the popup anchor.
+			// Insert a button linking to the popup anchor (same pattern as
+			// anchoring.spec.js). beforeEach already inserted a click popup,
+			// so we need a specific selector to avoid ambiguity.
 			await editor.insertBlock( {
-				name: 'core/paragraph',
-				attributes: {
-					content: '<a href="#hover-test-popup">Hover me</a>',
-				},
+				name: 'core/buttons',
+				innerBlocks: [
+					{
+						name: 'core/button',
+						attributes: {
+							text: 'Hover me',
+							url: '#hover-test-popup',
+							metadata: { popup: 'open' },
+						},
+					},
+				],
 			} );
 
 			// Insert the popup with hover trigger.
@@ -323,17 +332,21 @@ test.describe( 'Popup Block Options', () => {
 			const postId = await editor.publishPost();
 			await page.goto( `/?p=${ postId }` );
 
-			const dialog = page.locator( '.wp-block-hm-popup' );
-			const triggerLink = page.locator( 'a[href="#hover-test-popup"]' );
+			// Use the popup's specific id to avoid matching the click popup
+			// inserted by beforeEach.
+			const dialog = page.locator( '#hover-test-popup' );
+			const triggerLink = page.locator(
+				'.wp-block-button a[href$="#hover-test-popup"]'
+			);
 
 			// Dialog should not be open initially.
 			await expect( dialog ).not.toHaveAttribute( 'open', '' );
 
-			// Hover over the trigger link.
+			// Hover over the trigger button link.
 			await triggerLink.hover();
 
-			// Dialog should now be visible.
-			await expect( dialog ).toBeVisible();
+			// Dialog should now have the open attribute set by popup.show().
+			await expect( dialog ).toHaveAttribute( 'open', '' );
 		} );
 
 		test( 'undismissible popup cannot be closed via Escape', async ( {
