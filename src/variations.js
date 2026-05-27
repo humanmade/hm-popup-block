@@ -56,7 +56,8 @@ const withPopupControls = createHigherOrderComponent( ( BlockEdit ) => {
 						.filter(
 							( block ) =>
 								block?.attributes.anchor &&
-								block?.attributes.trigger === 'click'
+								( block?.attributes.trigger === 'click' ||
+									block?.attributes.trigger === 'hover' )
 						)
 						.map( ( block ) => ( {
 							label: block.attributes.anchor,

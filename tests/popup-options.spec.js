@@ -98,6 +98,42 @@ test.describe( 'Popup Block Options', () => {
 				page.getByText( 'Cookie expiration' )
 			).not.toBeVisible();
 		} );
+
+		test( 'can set trigger to "On hover"', async ( { editor, page } ) => {
+			await editor.openDocumentSettingsSidebar();
+			await page
+				.getByRole( 'combobox', { name: 'Popup Trigger' } )
+				.selectOption( 'hover' );
+
+			const blocks = await editor.getBlocks();
+			expect( blocks[ 0 ].attributes.trigger ).toBe( 'hover' );
+		} );
+
+		test( 'shows anchor/ID field for "hover" trigger', async ( {
+			editor,
+			page,
+		} ) => {
+			await editor.openDocumentSettingsSidebar();
+			await page
+				.getByRole( 'combobox', { name: 'Popup Trigger' } )
+				.selectOption( 'hover' );
+
+			await expect( page.getByText( 'Anchor / ID' ) ).toBeVisible();
+		} );
+
+		test( 'hides cookie expiration control for "hover" trigger', async ( {
+			editor,
+			page,
+		} ) => {
+			await editor.openDocumentSettingsSidebar();
+			await page
+				.getByRole( 'combobox', { name: 'Popup Trigger' } )
+				.selectOption( 'hover' );
+
+			await expect(
+				page.getByText( 'Cookie expiration' )
+			).not.toBeVisible();
+		} );
 	} );
 
 	test.describe( 'Dismissible option', () => {
@@ -177,6 +213,22 @@ test.describe( 'Popup Block Options', () => {
 			await expect( dialog ).toHaveAttribute( 'data-trigger', 'load' );
 		} );
 
+		test( 'outputs correct data attributes for hover trigger', async ( {
+			editor,
+			page,
+		} ) => {
+			await editor.openDocumentSettingsSidebar();
+			await page
+				.getByRole( 'combobox', { name: 'Popup Trigger' } )
+				.selectOption( 'hover' );
+
+			const postId = await editor.publishPost();
+			await page.goto( `/?p=${ postId }` );
+
+			const dialog = page.locator( '.wp-block-hm-popup' );
+			await expect( dialog ).toHaveAttribute( 'data-trigger', 'hover' );
+		} );
+
 		test( 'outputs closedby="any" for dismissible dialogs', async ( {
 			editor,
 			page,
@@ -242,6 +294,45 @@ test.describe( 'Popup Block Options', () => {
 			await page.reload();
 
 			const dialog = page.locator( '.wp-block-hm-popup' );
+			await expect( dialog ).toBeVisible();
+		} );
+
+		test( 'hover trigger opens popup on mouseenter', async ( {
+			editor,
+			page,
+		} ) => {
+			// Insert a link that targets the popup anchor.
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+				attributes: {
+					content: '<a href="#hover-test-popup">Hover me</a>',
+				},
+			} );
+
+			// Insert the popup with hover trigger.
+			await editor.insertBlock( {
+				name: 'hm/popup',
+				attributes: {
+					anchor: 'hover-test-popup',
+					trigger: 'hover',
+					className: 'is-style-anchored',
+					anchorPosition: 'bottom',
+				},
+			} );
+
+			const postId = await editor.publishPost();
+			await page.goto( `/?p=${ postId }` );
+
+			const dialog = page.locator( '.wp-block-hm-popup' );
+			const triggerLink = page.locator( 'a[href="#hover-test-popup"]' );
+
+			// Dialog should not be open initially.
+			await expect( dialog ).not.toHaveAttribute( 'open', '' );
+
+			// Hover over the trigger link.
+			await triggerLink.hover();
+
+			// Dialog should now be visible.
 			await expect( dialog ).toBeVisible();
 		} );
 
