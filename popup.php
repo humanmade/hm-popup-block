@@ -153,4 +153,16 @@ function action_init() : void {
 			'label' => __( 'Anchored', 'hm-popup' ),
 		]
 	);
+
+	register_block_pattern_category(
+		'hm-popup',
+		[ 'label' => __( 'Popups', 'hm-popup' ) ]
+	);
+
+	foreach ( glob( __DIR__ . '/patterns/*.php' ) as $pattern_file ) {
+		$pattern = include $pattern_file;
+		if ( is_array( $pattern ) && isset( $pattern['slug'] ) ) {
+			register_block_pattern( $pattern['slug'], $pattern );
+		}
+	}
 }
