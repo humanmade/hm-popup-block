@@ -45,7 +45,8 @@
       "enum": [
         "click",
         "exit",
-        "load"
+        "load",
+        "hover"
       ]
     },
     "cookieExpiration": {

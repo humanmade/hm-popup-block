@@ -24,6 +24,7 @@ const TRIGGERS = [
 	{ value: 'click', label: __( 'On click', 'hm-popup' ) },
 	{ value: 'exit', label: __( 'On exit intent', 'hm-popup' ) },
 	{ value: 'load', label: __( 'On page load', 'hm-popup' ) },
+	{ value: 'hover', label: __( 'On hover', 'hm-popup' ) },
 ];
 
 /**
@@ -338,6 +339,14 @@ export default function Edit( { attributes, setAttributes, clientId } ) {
 							) }
 						</p>
 					) }
+					{ attributes.trigger === 'hover' && (
+						<p>
+							{ __(
+								'The popup will appear when the visitor hovers over the trigger element. Works best with the Anchored block style.',
+								'hm-popup'
+							) }
+						</p>
+					) }
 					{ attributes.dismissible ? (
 						<p>
 							{ __(
@@ -367,7 +376,8 @@ export default function Edit( { attributes, setAttributes, clientId } ) {
 						value={ attributes.trigger }
 						onChange={ ( trigger ) => setAttributes( { trigger } ) }
 					/>
-					{ attributes.trigger === 'click' && (
+					{ ( attributes.trigger === 'click' ||
+						attributes.trigger === 'hover' ) && (
 						<TextControl
 							label={ __( 'Anchor / ID', 'hm-popup' ) }
 							help={

@@ -118,6 +118,58 @@ const bootstrap = () => {
 				window.localStorage.setItem( storageKey, Date.now() );
 			}
 		}
+
+		// Handle hover trigger.
+		if ( popup?.dataset.trigger === 'hover' ) {
+			const isAnchored = popup.classList.contains( 'is-style-anchored' );
+			const triggerSelector = `[href$="#${ popup.id || 'open-popup' }"]`;
+
+			document
+				.querySelectorAll( triggerSelector )
+				.forEach( ( triggerEl ) => {
+					const openHover = () => {
+						if ( isAnchored ) {
+							applyCssAnchorPositioning( popup, triggerEl );
+						}
+						popup.show();
+					};
+
+					// Open on hover and keyboard focus.
+					triggerEl.addEventListener( 'mouseenter', openHover );
+					triggerEl.addEventListener( 'focus', openHover );
+
+					// Close when cursor leaves trigger (unless moving to popup).
+					triggerEl.addEventListener( 'mouseleave', ( event ) => {
+						if ( ! popup.contains( event.relatedTarget ) ) {
+							popup.close();
+						}
+					} );
+
+					// Close when keyboard focus leaves trigger (unless moving to popup).
+					triggerEl.addEventListener( 'blur', ( event ) => {
+						if ( ! popup.contains( event.relatedTarget ) ) {
+							popup.close();
+						}
+					} );
+				} );
+
+			// Close when cursor leaves popup (unless returning to a trigger).
+			popup.addEventListener( 'mouseleave', ( event ) => {
+				const triggers = document.querySelectorAll( triggerSelector );
+				let movedToTrigger = false;
+				triggers.forEach( ( triggerEl ) => {
+					if (
+						triggerEl === event.relatedTarget ||
+						triggerEl.contains( event.relatedTarget )
+					) {
+						movedToTrigger = true;
+					}
+				} );
+				if ( ! movedToTrigger ) {
+					popup.close();
+				}
+			} );
+		}
 	} );
 
 	// Bind close events.
