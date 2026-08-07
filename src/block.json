@@ -40,7 +40,7 @@
 		"trigger": {
 			"type": "string",
 			"default": "click",
-			"enum": [ "click", "exit", "load" ]
+			"enum": [ "click", "exit", "load", "hover" ]
 		},
 		"cookieExpiration": {
 			"type": "number",
