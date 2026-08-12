@@ -65,6 +65,40 @@ Anchored popups automatically reposition when they would overflow the viewport.
 -   WordPress 6.1+
 -   PHP 7.0+
 
+## Release Process
+
+Releases are cut by the **Release** GitHub Actions workflow
+(`.github/workflows/release.yml`), triggered manually from the Actions tab.
+
+The workflow does everything _before_ the tag exists, then creates the tag
+once and never touches it again — this keeps every tag immutable, which is
+what Packagist requires (it rejects tag updates).
+
+### Creating a release
+
+1. Make sure `main` is green and contains the code you want to ship.
+2. Go to **Actions → Release → Run workflow**.
+3. Enter the version **without** a leading `v` (e.g. `1.2.3`).
+4. Run it.
+
+The workflow will then:
+
+1. Validate the version (must be `X.Y.Z`) and fail fast if the `vX.Y.Z` tag
+    already exists.
+2. Build the production assets (`npm ci && npm run build`).
+3. Stamp the version into `popup.php`, replacing the `__VERSION__` placeholder.
+4. Commit the built assets and stamped version, create an annotated tag
+    `vX.Y.Z` pointing at that commit, and push the tag — once, never
+    force-pushed.
+5. Build the distribution ZIP with `npm run plugin-zip` (`popup.zip`) and
+    publish a GitHub release with auto-generated notes.
+
+The version on `main` is always the literal placeholder `__VERSION__`; the real
+number only ever exists inside a release tag. Follow
+[Semantic Versioning](https://semver.org/). Because tags are immutable, if a
+release was wrong, **publish a new patch version** rather than trying to move a
+tag.
+
 ## License
 
 GPL-2.0-or-later
